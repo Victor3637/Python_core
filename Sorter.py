@@ -1,5 +1,9 @@
 import os
 import shutil
+import argparse
+import zipfile
+import tarfile
+
 unknown_exts = set()
 
 def normalize(filename):
@@ -53,7 +57,18 @@ def process_folder(folder_path):
                 dest_subfolder = normalize(filename)
                 dest_folder = os.path.join(dest_folder, dest_subfolder)
                 os.makedirs(dest_folder, exist_ok=True)
-                shutil.unpack_archive(os.path.join(root, file), dest_folder)
+
+                archive_path = os.path.join(root, file)
+                if ext == 'ZIP':
+                    with zipfile.ZipFile(archive_path, 'r') as zip_ref:
+                        zip_ref.extractall(dest_folder)
+                elif ext == 'GZ':
+                    with tarfile.open(archive_path, 'r:gz') as tar_ref:
+                        tar_ref.extractall(dest_folder)
+                elif ext == 'TAR':
+                    with tarfile.open(archive_path, 'r') as tar_ref:
+                        tar_ref.extractall(dest_folder)
+
                 continue
             else:
                 unknown_exts.add(ext)
@@ -65,9 +80,15 @@ def process_folder(folder_path):
 
     return known_extensions
 
-# Введення шляху до папки
-target_folder = input("Введіть шлях до папки: ")
-known_extensions = process_folder(target_folder)
+# Визначення аргументів командного рядка
+parser = argparse.ArgumentParser(description='Folder Sorting Script')
+parser.add_argument('folder_path', type=str, help='Path to the folder for sorting')
+
+# Отримання аргументів командного рядка
+args = parser.parse_args()
+
+# Обробка папки
+known_extensions = process_folder(args.folder_path)
 
 print('Known extensions:')
 print(', '.join(known_extensions))
