@@ -9,8 +9,5 @@ setup(
     author_email='flyingcircus@example.com',
     license='MIT',
     packages=find_namespace_packages(),
-    entry_points={
-        'console_scripts': 
-            ['hello = clean_folder.hellow:helloworld']
-        }
+    entry_points={'console_scripts': ['clean-folder = clean_folder.clean:sorter']}
 )
